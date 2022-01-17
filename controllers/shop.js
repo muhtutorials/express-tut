@@ -2,43 +2,41 @@ const Product = require('../models/product');
 const Cart = require('../models/cart');
 
 exports.getIndex = (req, res) => {
-  Product.getAll()
-    .then(([rows]) => {
-      res.render('shop/index', { pageTitle: 'Shop', path: '/', prods: rows});
+  Product.findAll()
+    .then(products => {
+      res.render('shop/index', { pageTitle: 'Shop', path: '/', prods: products});
     })
-    .catch();
+    .catch(err => console.log(err));
 };
 
 exports.getProducts = (req, res) => {
-  Product.getAll()
-    .then(([rows]) => {
-      res.render('shop/product-list', { pageTitle: 'All Products', path: '/products', prods: rows });
+  Product.findAll()
+    .then(products => {
+      res.render('shop/product-list', { pageTitle: 'All Products', path: '/products', prods: products });
     })
-    .catch();
+    .catch(err => console.log(err));
 };
 
 exports.getProduct = (req, res) => {
   const productId = req.params.productId;
-  Product.findById()
-    .then(([product]) => {
-      res.render('shop/product-detail', { pageTitle: product.title, path: '/products', product: product[0] });
+  Product.findByPk(productId)
+    .then(product => {
+      console.log(product)
+      res.render('shop/product-detail', { pageTitle: product.title, path: '/products', product });
     })
-    .catch();
+    .catch(err => console.log(err));
 };
 
 exports.getCart = (req, res) => {
-  Cart.getCart(cart => {
-    Product.getAll(products => {
-      const cartProducts = [];
-      for (const product of products) {
-        const cartProductData = cart.products.find(item => item.id === product.id);
-        if (cartProductData) {
-          cartProducts.push({ productData: product, quantity: cartProductData.quantity });
-        }
-      }
-      res.render('shop/cart', { pageTitle: 'Cart', path: '/cart', products: cartProducts });
+  req.user.getCart()
+    .then(cart => {
+      return cart.getProducts()
+        .then(products => {
+          res.render('shop/cart', { pageTitle: 'Cart', path: '/cart', products });
+        })
+        .catch(err => console.log(err));
     })
-  })
+    .catch(err => console.log(err))
 }
 
 exports.postCart = (req, res) => {
