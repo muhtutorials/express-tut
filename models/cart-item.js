@@ -1,8 +1,9 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 const sequelize = require('../utils/database');
 
-const CartItem = sequelize.define('cart-item', {
+// "cartItem" is the name of the magic method and the name of the table in lowercase
+const CartItem = sequelize.define('cartItem', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
