@@ -41,12 +41,6 @@ exports.postEditProduct = (req, res) => {
       product.description = description;
       product.price = price;
       return product.save();
-      res.render('admin/edit-product', {
-        pageTitle: 'Edit Product',
-        path: '/admin/edit-product',
-        editing: true,
-        product
-      });
     })
     .then(result => res.redirect('/admin/products'))
     .catch(err => console.log(err));

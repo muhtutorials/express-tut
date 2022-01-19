@@ -1,5 +1,15 @@
-const Sequelize = require('sequelize');
+const mongodb = require('mongodb');
 
-const sequelize = new Sequelize('express-tut', 'root', '', { dialect: 'mysql' });
+const MongoClient = mongodb.MongoClient;
 
-module.exports = sequelize;
+const mongoConnect = callback => {
+  MongoClient
+    .connect('mongodb+srv://igor:123321@mycluster.mwr2c.mongodb.net/express-tut?retryWrites=true&w=majority')
+    .then(client => {
+      callback(client);
+      console.log(client);
+    })
+    .catch(err => console.log(err));
+}
+
+module.exports = mongoConnect;
