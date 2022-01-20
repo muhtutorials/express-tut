@@ -6,20 +6,20 @@ exports.getAddProduct = (req, res) => {
 
 exports.postAddProduct = (req, res) => {
   const { title, imageUrl, description, price } = req.body;
-  // const userId = req.user.id;
-  // Product.create({ title, imageUrl, description, price, userId })
-  // or
-  req.user.createProduct({ title, imageUrl, description, price })
+  const userId = req.user._id;
+
+  const product = new Product(title, imageUrl, description, price, userId);
+  
+  product.save()
     .then(() => res.redirect('/'))
     .catch(err => console.log(err));
 };
 
 exports.getEditProduct = (req, res) => {
   const productId = req.params.productId;
-  // Product.findByPk(productId)
-  req.user.getProducts({ 'where': { id: productId } })
-    .then(products => {
-      const product = products[0]
+
+  Product.findById(productId)
+    .then(product => {
       if (!product) res.render('/');
       res.render('admin/edit-product', {
         pageTitle: 'Edit Product',
@@ -33,30 +33,21 @@ exports.getEditProduct = (req, res) => {
 
 exports.postEditProduct = (req, res) => {
   const { productId, title, imageUrl, description, price } = req.body;
-  Product.findByPk(productId)
-    .then(product => {
-      if (!product) res.render('/');
-      product.title = title;
-      product.imageUrl = imageUrl;
-      product.description = description;
-      product.price = price;
-      return product.save();
-    })
-    .then(result => res.redirect('/admin/products'))
-    .catch(err => console.log(err));
+    const product = new Product(title, imageUrl, description, price, productId);
+    product.save()
+      .then(result => res.redirect('/admin/products'))
+      .catch(err => console.log(err));
 };
 
 exports.postDeleteProduct = (req, res) => {
   const productId = req.body.productId;
-  Product.destroy({ where: { id: productId } })
+  Product.deleteById(productId)
     .then(() => res.redirect('/admin/products'))
     .catch(err => console.log(err));
 };
 
-
 exports.getProducts = (req, res) => {
-  // Product.findAll()
-  req.user.getProducts()
+  Product.fetchAll()
     .then(products => {
       res.render('admin/products', { pageTitle: 'Admin Products', path: '/admin/products', prods: products });
     })
