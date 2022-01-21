@@ -4,11 +4,11 @@ const {
   getIndex,
   getProducts,
   getProduct,
-  // getCart,
-  // postCart,
-  // postCartDeleteProduct,
-  // getOrders,
-  // postOrder,
+  getCart,
+  postCart,
+  postCartDeleteProduct,
+  getOrders,
+  postOrder,
   // getCheckout
 } = require('../controllers/shop');
 
@@ -20,15 +20,15 @@ router.get('/products', getProducts);
 
 router.get('/products/:productId', getProduct);
 
-// router.get('/cart', getCart);
-//
-// router.post('/cart', postCart);
-//
-// router.post('/cart-delete-item', postCartDeleteProduct);
-//
-// router.get('/orders', getOrders);
-//
-// router.post('/orders', postOrder);
+router.get('/cart', getCart);
+
+router.post('/cart', postCart);
+
+router.post('/cart-delete-item', postCartDeleteProduct);
+
+router.get('/orders', getOrders);
+
+router.post('/orders', postOrder);
 
 // router.get('/checkout', getCheckout);
 
