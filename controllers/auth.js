@@ -8,8 +8,8 @@ const { validationResult } = require('express-validator');
 
 const User = require('../models/user');
 
-const mailgun = new Mailgun(formData);
-const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY });
+// const mailgun = new Mailgun(formData);
+// const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY });
 
 exports.getLogin = (req, res) => {
   let message = req.flash('error');
@@ -106,9 +106,9 @@ exports.postSignup = (req, res) => {
             text: 'You have signed up successfully',
             html: '<strong>You have signed up successfully!</strong>',
           }
-          mg.messages.create('sandbox1da4abab42c94a0dbf61c48268278c23.mailgun.org', msg)
-            .then(response => console.log(response)) // logs response data
-            .catch(err => console.log(err))
+          // mg.messages.create('sandbox1da4abab42c94a0dbf61c48268278c23.mailgun.org', msg)
+          //   .then(response => console.log(response)) // logs response data
+          //   .catch(err => console.log(err))
           res.redirect('/login');
         })
         .catch(err => console.log(err));

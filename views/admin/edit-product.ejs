@@ -48,7 +48,7 @@
                     rows="5"><% if (editing || hasError) { %><%= product.description %><% } %></textarea>
         </div>
         <% if (editing) { %>
-            <input type="hidden" value="<%= product.productId %>" name="productId">
+            <input type="hidden" value="<%= product._id %>" name="productId">
         <% } %>
 
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
