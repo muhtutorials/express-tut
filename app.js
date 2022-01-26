@@ -6,6 +6,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
@@ -21,11 +22,30 @@ const store = MongoDBStore({
   collection: 'sessions'
 });
 const csrfProtection = csrf({ cookie: false });
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    // directory specified in the cb function must be created manually otherwise an error is thrown
+    cb(null, path.join('data', 'images'))
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, uniqueSuffix + '-' + file.originalname)
+  }
+});
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
 app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({ extended: true }));
+app.use(multer({ storage: fileStorage, fileFilter }).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/data', express.static(path.join(__dirname, 'data')));
 app.use(session({ secret: 'ratamahata', resave: false, saveUninitialized: false, store }));
 app.use(csrfProtection);
 app.use(flash());
@@ -53,12 +73,12 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
-app.get('/500', get500);
+// app.get('/500', get500);
 app.use(get404);
 
-app.use((error, req, res, next) => {
-  res.status(500).render('500', { pageTitle: 'Error!', path: '' });
-});
+// app.use((error, req, res, next) => {
+//   res.status(500).render('500', { pageTitle: 'Error!', path: '' });
+// });
 
 mongoose.connect(MONGODB_URI)
   .then(() => {
