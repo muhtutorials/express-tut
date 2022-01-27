@@ -5,8 +5,8 @@ const {
   postAddProduct,
   getEditProduct,
   postEditProduct,
-  getProducts,
-  postDeleteProduct
+  deleteProduct,
+  getProducts
 } = require('../controllers/admin');
 const isAuth = require('../middleware/is-auth');
 const { productValidator } = require('../validators/admin');
@@ -21,7 +21,7 @@ router.get('/edit-product/:productId', isAuth, getEditProduct);
 
 router.post('/edit-product', productValidator(), isAuth, postEditProduct);
 
-router.post('/delete-product', isAuth, postDeleteProduct);
+router.delete('/products/:productId', isAuth, deleteProduct);
 
 router.get('/products', isAuth, getProducts);
 

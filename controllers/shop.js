@@ -6,26 +6,53 @@ const PDFDocument = require('pdfkit');
 const Product = require('../models/product');
 const Order = require('../models/order');
 
+const ITEMSPERPAGE = 2;
+
 exports.getIndex = (req, res) => {
-  Product.find()
+  const page = parseInt(req.query.page) || 1;
+  let totalItems;
+
+  Product.find().countDocuments()
+    .then(numOfProducts => {
+      totalItems = numOfProducts;
+      return Product.find().skip((page - 1) * ITEMSPERPAGE).limit(ITEMSPERPAGE);
+    })
     .then(products => {
-      console.log(req)
       res.render('shop/index', {
         pageTitle: 'Shop',
         path: '/',
-        prods: products
+        prods: products,
+        currentPage: page,
+        hasNextPage: ITEMSPERPAGE * page < totalItems,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalItems / ITEMSPERPAGE)
       });
     })
     .catch(err => console.log(err));
 };
 
 exports.getProducts = (req, res) => {
-  Product.find()
+  const page = parseInt(req.query.page) || 1;
+  let totalItems;
+
+  Product.find().countDocuments()
+    .then(numOfProducts => {
+      totalItems = numOfProducts;
+      return Product.find().skip((page - 1) * ITEMSPERPAGE).limit(ITEMSPERPAGE);
+    })
     .then(products => {
       res.render('shop/product-list', {
         pageTitle: 'All Products',
         path: '/products',
-        prods: products
+        prods: products,
+        currentPage: page,
+        hasNextPage: ITEMSPERPAGE * page < totalItems,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalItems / ITEMSPERPAGE)
       });
     })
     .catch(err => console.log(err));
@@ -71,6 +98,24 @@ exports.postCartDeleteProduct = (req, res) => {
   req.user.removeFromCart(productId)
     .then(() => res.redirect('/cart'))
     .catch(err => console.log(err))
+};
+
+exports.getCheckout = (req, res) => {
+  req.user.populate('cart.products.productId')
+    .then(user => {
+      const products = user.cart.products;
+      let total = 0;
+      products.forEach(p => {
+        total += p.quantity * p.productId.price;
+      })
+      res.render('shop/checkout', {
+        pageTitle: 'Checkout',
+        path: '/checkout',
+        products,
+        totalSum: total
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 exports.postOrder = (req, res) => {
