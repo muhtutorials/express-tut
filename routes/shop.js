@@ -8,8 +8,8 @@ const {
   postCart,
   postCartDeleteProduct,
   getCheckout,
+  getCheckoutSuccess,
   getOrders,
-  postOrder,
   getInvoice
 } = require('../controllers/shop');
 const isAuth = require('../middleware/is-auth');
@@ -30,9 +30,16 @@ router.post('/cart-delete-item', isAuth, postCartDeleteProduct);
 
 router.get('/checkout', isAuth, getCheckout);
 
-router.get('/orders', isAuth, getOrders);
+// This route can be accessed by manually typing the url in the url bar,
+// that's why it's unreliable for checking paid orders.
+// Paid orders should be checked in the Stripe dashboard.
+// To create a reliable success page with paid orders Stripe webhooks should be used
+// which don't work with a local development server.
+router.get('/checkout/success', isAuth, getCheckoutSuccess);
 
-router.post('/orders', isAuth, postOrder);
+router.get('/checkout/cancel', isAuth, getCheckout);
+
+router.get('/orders', isAuth, getOrders);
 
 router.get('/orders/:orderId', isAuth, getInvoice);
 

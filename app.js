@@ -1,5 +1,6 @@
 const path = require('path');
 
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
@@ -14,11 +15,9 @@ const authRoutes = require('./routes/auth');
 const { get404, get500 } = require('./controllers/error');
 const User = require('./models/user');
 
-const MONGODB_URI = 'mongodb+srv://igor:123321@mycluster.mwr2c.mongodb.net/express-tut?retryWrites=true&w=majority';
-
 const app = express();
 const store = MongoDBStore({
-  uri: MONGODB_URI,
+  uri: process.env.MONGODB_URI,
   collection: 'sessions'
 });
 const csrfProtection = csrf({ cookie: false });
@@ -80,9 +79,9 @@ app.use(get404);
 //   res.status(500).render('500', { pageTitle: 'Error!', path: '' });
 // });
 
-mongoose.connect(MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     app.listen(3000);
-    console.log('Connected to MongoDB')
+    console.log('Connected to MongoDB server')
   })
   .catch(err => console.log(err));
