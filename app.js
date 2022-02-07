@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 
 require('dotenv').config();
 const express = require('express');
@@ -8,6 +9,9 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
 const multer = require('multer');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
@@ -39,7 +43,18 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+
 app.set('view engine', 'ejs');
+
+// Helmet helps you secure your Express apps by setting various HTTP headers
+app.use(helmet());
+
+// compress all responses (usually provided by hosting provider)
+app.use(compression());
+
+// HTTP request logger middleware (usually provided by hosting provider)
+app.use(morgan('combined', { stream: accessLogStream }));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(multer({ storage: fileStorage, fileFilter }).single('image'));
